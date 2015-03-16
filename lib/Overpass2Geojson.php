@@ -30,7 +30,12 @@ class Overpass2Geojson
 
         foreach ($inputArray['elements'] as $osmItem) {
             if (isset($osmItem['type']) && $osmItem['type'] === 'way') {
-                $output['features'] []= array();
+                $output['features'] []= array(
+                    'geometry' => array(
+                        'type' => 'LineString',
+                        'coordinates' => array(),
+                    ),
+                );
             }
         }
 
