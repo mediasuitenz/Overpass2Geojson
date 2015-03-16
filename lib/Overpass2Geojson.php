@@ -7,6 +7,11 @@ class Overpass2Geojson
         if (!is_string($input)) {
             return false;
         }
+        $inputArray = json_decode($input, true);
+        if (!isset($inputArray['elements']) || !is_array($inputArray['elements'])) {
+            return false;
+        }
+
         return '';
     }
 }
