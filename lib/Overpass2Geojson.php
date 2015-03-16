@@ -41,4 +41,24 @@ class Overpass2Geojson
 
         return $encode ? json_encode($output) : $output;
     }
+
+    /**
+     * Creates an array of node coordinates indexed by node id
+     * @param  array $elements  OSM items
+     * @return array            node coordinates e.g. [id => [lon, lat], ...]
+     */
+    public static function collectNodes($elements) {
+        $nodes = array();
+        if (!is_array($elements)) {
+            return $nodes;
+        }
+        foreach ($elements as $osmItem) {
+            if (isset($osmItem['type']) && $osmItem['type'] === 'node') {
+                if (isset($osmItem['id']) && isset($osmItem['lat']) && isset($osmItem['lon'])) {
+                    $nodes[$osmItem['id']] = array($osmItem['lon'], $osmItem['lat']);
+                }
+            }
+        }
+        return $nodes;
+    }
 }

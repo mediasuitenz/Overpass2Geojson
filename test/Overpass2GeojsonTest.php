@@ -76,6 +76,28 @@ class Overpass2GeojsonTest extends PHPUnit_Framework_TestCase
         $this->assertTrue(is_array($output['features']), 'Should return geojson with features array');
     }
 
+    public function testCollectNodes() {
+        $input = null;
+        $output = Overpass2Geojson::collectNodes($input);
+        $this->assertTrue(is_array($output), 'Should return an array');
+
+        $input = array(
+            array('type' => 'node'),
+            array('type' => 'node', 'id' => 12314513113, 'lat' => 123.4567, 'lon' => -13.13415),
+            array('type' => 'way'),
+            array('type' => 'node', 'id' => 13542524325, 'lat' => 151.1341, 'lon' => 32.26244),
+        );
+        $output = Overpass2Geojson::collectNodes($input);
+        $this->assertTrue(is_array($output), 'Should return an array');
+        $this->assertSame(2, count($output), 'Should have an entry for each valid node');
+
+        $this->assertTrue(isset($output['12314513113']), 'Should be indexed by node id');
+        $this->assertSame(array(-13.13415, 123.4567), $output['12314513113'], 'Should have original coordinates');
+
+        $this->assertTrue(isset($output['13542524325']), 'Should be indexed by node id');
+        $this->assertSame(array(32.26244, 151.1341), $output['13542524325'], 'Should have original coordinates');
+    }
+
     public function testSmallDataset() {
 
         $input = file_get_contents(__DIR__ . '/data/small.json');
