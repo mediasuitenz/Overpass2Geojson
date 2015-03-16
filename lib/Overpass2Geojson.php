@@ -40,7 +40,7 @@ class Overpass2Geojson
                         }
                     }
                 }
-                if (count($coords) > 0) {
+                if (count($coords) >= 2) {
                     $output['features'] []= array(
                         'type' => 'Feature',
                         'geometry' => array(

@@ -134,7 +134,7 @@ class Overpass2GeojsonTest extends PHPUnit_Framework_TestCase
         $input = file_get_contents(__DIR__ . '/data/missingNodes.json');
         $output = Overpass2Geojson::convert($input, false);
 
-        $this->assertSame(1, count($output['features']), 'Should return 1 feature');
+        $this->assertSame(1, count($output['features']), 'Should only create a feature for ways with more than 1 node');
         $coords = $output['features'][0]['geometry']['coordinates'];
         $this->assertSame(3, count($coords), 'Feature should have as many coordinates as exist in data');
         $this->assertSame(array(172.6427486, -43.5309800), $coords[0], 'Coordinate should match the original node coordinate');
