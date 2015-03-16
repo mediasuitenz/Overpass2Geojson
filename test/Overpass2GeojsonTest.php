@@ -107,6 +107,9 @@ class Overpass2GeojsonTest extends PHPUnit_Framework_TestCase
 
         $feature1 = $output['features'][0];
         $feature2 = $output['features'][1];
+        $this->assertTrue(isset($feature1['type']), 'A feature should have type');
+        $this->assertSame('Feature', $feature1['type'], 'A feature should have type Feature');
+
         $this->assertTrue(isset($feature1['geometry']), 'A feature should have geometry');
         $this->assertTrue(is_array($feature1['geometry']), 'A feature should have a geometry array');
 
