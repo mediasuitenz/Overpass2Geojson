@@ -32,21 +32,23 @@ class Overpass2Geojson
 
         foreach ($inputArray['elements'] as $osmItem) {
             if (isset($osmItem['type']) && $osmItem['type'] === 'way') {
-                $feature = array(
-                    'type' => 'Feature',
-                    'geometry' => array(
-                        'type' => 'LineString',
-                        'coordinates' => array(),
-                    ),
-                );
+                $coords = array();
                 if (isset($osmItem['nodes'])) {
                     foreach ($osmItem['nodes'] as $nodeId) {
                         if (isset($nodes[$nodeId])) {
-                            $feature['geometry']['coordinates'] []= $nodes[$nodeId];
+                            $coords []= $nodes[$nodeId];
                         }
                     }
                 }
-                $output['features'] []= $feature;
+                if (count($coords) > 0) {
+                    $output['features'] []= array(
+                        'type' => 'Feature',
+                        'geometry' => array(
+                            'type' => 'LineString',
+                            'coordinates' => $coords,
+                        ),
+                    );
+                }
             }
         }
 

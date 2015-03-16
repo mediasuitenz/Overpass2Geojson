@@ -1,0 +1,73 @@
+{
+  "version": 0.6,
+  "generator": "Overpass API",
+  "osm3s": {
+    "timestamp_osm_base": "2015-03-16T05:09:02Z",
+    "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL."
+  },
+  "elements": [
+{
+  "type": "node",
+  "id": 11111111,
+  "lat": -43.5309812,
+  "lon": 172.6421908,
+  "tags": {
+    "ccc": "cyclingpath"
+  }
+},
+{
+  "type": "node",
+  "id": 31064366,
+  "lat": -43.5309800,
+  "lon": 172.6427486
+},
+{
+  "type": "node",
+  "id": 31064363,
+  "lat": -43.5309786,
+  "lon": 172.6433114
+},
+{
+  "type": "node",
+  "id": 31064368,
+  "lat": -43.5309823,
+  "lon": 172.6433613,
+  "tags": {
+    "ccc": "cyclingpath",
+    "chchsid": "24",
+    "highway": "traffic_signals"
+  }
+},
+{
+  "type": "way",
+  "id": 4830778,
+  "nodes": [
+    31064347,
+    31813685
+  ],
+  "tags": {
+    "access": "yes",
+    "ccc": "cyclingpath",
+    "foot": "yes",
+    "highway": "residential",
+    "maxspeed": "50",
+    "name": "Worcester Street"
+  }
+},
+{
+  "type": "way",
+  "id": 4830782,
+  "nodes": [
+    31064347,
+    31064365,
+    31064366,
+    31064363,
+    31064368
+  ],
+  "tags": {
+    "ccc": "cyclingpath",
+    "highway": "footway"
+  }
+}
+  ]
+}
