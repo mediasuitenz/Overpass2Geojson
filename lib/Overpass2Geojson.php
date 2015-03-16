@@ -32,29 +32,15 @@ class Overpass2Geojson
 
         foreach ($inputArray['elements'] as $osmItem) {
             if (isset($osmItem['type']) && $osmItem['type'] === 'way') {
-                $coords = array();
-                if (isset($osmItem['nodes'])) {
-                    foreach ($osmItem['nodes'] as $nodeId) {
-                        if (isset($nodes[$nodeId])) {
-                            $coords []= $nodes[$nodeId];
-                        }
-                    }
-                }
-                if (count($coords) >= 2) {
-                    $output['features'] []= array(
-                        'type' => 'Feature',
-                        'geometry' => array(
-                            'type' => 'LineString',
-                            'coordinates' => $coords,
-                        ),
-                    );
+                $feature = self::createFeature($osmItem, $nodes);
+                if ($feature) {
+                    $output['features'] []= $feature;
                 }
             }
         }
 
         return $encode ? json_encode($output) : $output;
     }
-
     /**
      * Creates an array of node coordinates indexed by node id
      * @param  array $elements  OSM items
@@ -73,5 +59,33 @@ class Overpass2Geojson
             }
         }
         return $nodes;
+    }
+
+    /**
+     * Creates a Feature array with geometry from matching nodes
+     * @param  array $element  OSM way
+     * @param  array $nodes    OSM node coordinates indexed by id
+     * @return mixed           false if invalid feature otherwise
+     *                         array GeoJSON Feature with LineString geometry
+     */
+    public static function createFeature($way, $nodes) {
+        $coords = array();
+        if (isset($way['nodes'])) {
+            foreach ($way['nodes'] as $nodeId) {
+                if (isset($nodes[$nodeId])) {
+                    $coords []= $nodes[$nodeId];
+                }
+            }
+        }
+        if (count($coords) >= 2) {
+            return array(
+                'type' => 'Feature',
+                'geometry' => array(
+                    'type' => 'LineString',
+                    'coordinates' => $coords,
+                ),
+            );
+        }
+        return false;
     }
 }
