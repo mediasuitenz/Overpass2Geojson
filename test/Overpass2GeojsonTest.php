@@ -75,4 +75,12 @@ class Overpass2GeojsonTest extends PHPUnit_Framework_TestCase
         $this->assertTrue(isset($output['features']), 'Should return geojson with features');
         $this->assertTrue(is_array($output['features']), 'Should return geojson with features array');
     }
+
+    public function testSmallDataset() {
+
+        $input = file_get_contents(__DIR__ . '/data/small.json');
+        $output = Overpass2Geojson::convert($input, false);
+
+        $this->assertSame(2, count($output['features']), 'Should return 2 features');
+    }
 }
