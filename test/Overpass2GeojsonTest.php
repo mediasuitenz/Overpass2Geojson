@@ -106,6 +106,7 @@ class Overpass2GeojsonTest extends PHPUnit_Framework_TestCase
         $this->assertSame(2, count($output['features']), 'Should return 2 features');
 
         $feature1 = $output['features'][0];
+        $feature2 = $output['features'][1];
         $this->assertTrue(isset($feature1['geometry']), 'A feature should have geometry');
         $this->assertTrue(is_array($feature1['geometry']), 'A feature should have a geometry array');
 
@@ -114,5 +115,15 @@ class Overpass2GeojsonTest extends PHPUnit_Framework_TestCase
 
         $this->assertTrue(isset($feature1['geometry']['coordinates']), 'Geometry should have coordinates');
         $this->assertTrue(is_array($feature1['geometry']['coordinates']), 'Geometry should have a coordinates array');
+
+        $this->assertSame(2, count($feature1['geometry']['coordinates']), 'Feature should have same number of coordinates as original way');
+        $this->assertSame(5, count($feature2['geometry']['coordinates']), 'Feature should have same number of coordinates as original way');
+
+        $coords1 = $feature1['geometry']['coordinates'];
+        $this->assertTrue(is_array($coords1[0]), 'Each coordinate should be an array');
+        $this->assertTrue(is_array($coords1[1]), 'Each coordinate should be an array');
+
+        $this->assertSame(array(172.6420391, -43.5309816), $coords1[0], 'Coordinate should match the original node coordinate');
+        $this->assertSame(array(172.6396892, -43.5309652), $coords1[1], 'Coordinate should match the original node coordinate');
     }
 }

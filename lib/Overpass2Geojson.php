@@ -28,14 +28,24 @@ class Overpass2Geojson
             'features' => array(),
         );
 
+        $nodes = self::collectNodes($inputArray['elements']);
+
         foreach ($inputArray['elements'] as $osmItem) {
             if (isset($osmItem['type']) && $osmItem['type'] === 'way') {
-                $output['features'] []= array(
+                $feature = array(
                     'geometry' => array(
                         'type' => 'LineString',
                         'coordinates' => array(),
                     ),
                 );
+                if (isset($osmItem['nodes'])) {
+                    foreach ($osmItem['nodes'] as $nodeId) {
+                        if (isset($nodes[$nodeId])) {
+                            $feature['geometry']['coordinates'] []= $nodes[$nodeId];
+                        }
+                    }
+                }
+                $output['features'] []= $feature;
             }
         }
 
