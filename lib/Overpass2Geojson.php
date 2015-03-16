@@ -23,7 +23,9 @@ class Overpass2Geojson
             return false;
         }
 
-        $output = array();
+        $output = array(
+            'type' => 'FeatureCollection',
+        );
 
         return $encode ? json_encode($output) : $output;
     }
