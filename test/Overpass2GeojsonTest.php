@@ -71,5 +71,8 @@ class Overpass2GeojsonTest extends PHPUnit_Framework_TestCase
 
         $this->assertTrue(isset($output['type']), 'Should return geojson with a type');
         $this->assertEquals('FeatureCollection', $output['type'], 'Should return geojson with type FeatureCollection');
+
+        $this->assertTrue(isset($output['features']), 'Should return geojson with features');
+        $this->assertTrue(is_array($output['features']), 'Should return geojson with features array');
     }
 }
