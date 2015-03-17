@@ -9,6 +9,11 @@ class Overpass2Geojson
      * @return mixed           false if failed, otherwise GeoJSON string or array
      */
     public static function convert($input, $encode=true) {
+        $inputArray = self::validateInput($input);
+        return $inputArray !== false ? self::doConversion($inputArray, $encode) : false;
+    }
+
+    private static function validateInput($input) {
         if (is_array($input)) {
             $inputArray = $input;
         } else if (is_string($input)) {
@@ -22,15 +27,18 @@ class Overpass2Geojson
 
             return false;
         }
+        return $inputArray;
+    }
 
+    private static function doConversion($input, $encode) {
         $output = array(
             'type' => 'FeatureCollection',
             'features' => array(),
         );
 
-        $nodes = self::collectNodes($inputArray['elements']);
+        $nodes = self::collectNodes($input['elements']);
 
-        foreach ($inputArray['elements'] as $osmItem) {
+        foreach ($input['elements'] as $osmItem) {
             if (isset($osmItem['type']) && $osmItem['type'] === 'way') {
                 $feature = self::createFeature($osmItem, $nodes);
                 if ($feature) {
@@ -41,6 +49,7 @@ class Overpass2Geojson
 
         return $encode ? json_encode($output) : $output;
     }
+
     /**
      * Creates an array of node coordinates indexed by node id
      * @param  array $elements  OSM items
