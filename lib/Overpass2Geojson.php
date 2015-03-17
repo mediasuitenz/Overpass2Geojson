@@ -63,7 +63,7 @@ class Overpass2Geojson
 
     /**
      * Creates a Feature array with geometry from matching nodes
-     * @param  array $element  OSM way
+     * @param  array $way  OSM way
      * @param  array $nodes    OSM node coordinates indexed by id
      * @return mixed           false if invalid feature otherwise
      *                         array GeoJSON Feature with LineString geometry
