@@ -117,6 +117,14 @@ class Overpass2GeojsonTest extends PHPUnit_Framework_TestCase
         $this->assertSame('LineString', $feature1['geometry']['type'], 'Geometry should have type LineString');
 
         $this->assertTrue(isset($feature1['properties']), 'A feature should have a properties array');
+        $tags = array(
+            "access" => "yes",
+            "ccc" => "cyclingpath",
+            "foot" => "yes",
+            "highway" => "residential",
+            "maxspeed" => "50",
+            "name" => "Worcester Street");
+        $this->assertSame($feature1['properties'], $tags, 'A feature\'s property array should contain all of its tags');
 
         $this->assertTrue(isset($feature1['geometry']['coordinates']), 'Geometry should have coordinates');
         $this->assertTrue(is_array($feature1['geometry']['coordinates']), 'Geometry should have a coordinates array');
