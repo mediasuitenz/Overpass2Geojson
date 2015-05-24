@@ -93,6 +93,7 @@ class Overpass2Geojson
                     'type' => 'LineString',
                     'coordinates' => $coords,
                 ),
+                'properties' => isset($way['tags']) ? $way['tags'] : array(),
             );
         }
         return false;
