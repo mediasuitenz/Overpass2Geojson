@@ -1,16 +1,60 @@
 <?php
 
-class Overpass2Geojson
-{
+class Overpass2Geojson {
     /**
-     * Converts a JSON string or decoded array into a GeoJSON string or array
+     * Converts a JSON string or decoded array into a GeoJSON string or array.
+     * This creates a LineString feature for each supplied way, using the nodes
+     * only as points for the LineString.
      * @param  mixed   $input  JSON string or array
      * @param  boolean $encode whether to encode output as string
      * @return mixed           false if failed, otherwise GeoJSON string or array
      */
-    public static function convert($input, $encode=true) {
+    public static function convertWays($input, $encode = true) {
         $inputArray = self::validateInput($input);
-        return $inputArray !== false ? self::doConversion($inputArray, $encode) : false;
+        if (!$inputArray) {
+            return false;
+        }
+        $nodes = self::collectNodes($inputArray['elements']);
+        $output = array(
+            'type' => 'FeatureCollection',
+            'features' => array(),
+        );
+        foreach ($inputArray['elements'] as $osmItem) {
+            if (isset($osmItem['type']) && $osmItem['type'] === 'way') {
+                $feature = self::createWayFeature($osmItem, $nodes);
+                if ($feature) {
+                    $output['features'][] = $feature;
+                }
+            }
+        }
+        return $encode ? json_encode($output) : $output;
+    }
+
+    /**
+     * Converts a JSON string or decoded array into a GeoJSON string or array.
+     * This creates a Point feature for each supplied node, ignoring ways.
+     * @param  mixed   $input  JSON string or array
+     * @param  boolean $encode whether to encode output as string
+     * @return mixed           false if failed, otherwise GeoJSON string or array
+     */
+    public static function convertNodes($input, $encode = true) {
+        $inputArray = self::validateInput($input);
+        $nodes = self::collectNodes($inputArray['elements']);
+        $output = array(
+            'type' => 'FeatureCollection',
+            'features' => array(),
+        );
+        foreach ($nodes as $node) {
+            $output['features'][] = array(
+                'type' => 'Feature',
+                'properties' => isset($node['tags']) ? $node['tags'] : array(),
+                'geometry' => array(
+                    'type' => 'Point',
+                    'coordinates' => array($node['lon'], $node['lat']),
+                ),
+            );
+        }
+        return $encode ? json_encode($output) : $output;
     }
 
     private static function validateInput($input) {
@@ -30,30 +74,10 @@ class Overpass2Geojson
         return $inputArray;
     }
 
-    private static function doConversion($input, $encode) {
-        $output = array(
-            'type' => 'FeatureCollection',
-            'features' => array(),
-        );
-
-        $nodes = self::collectNodes($input['elements']);
-
-        foreach ($input['elements'] as $osmItem) {
-            if (isset($osmItem['type']) && $osmItem['type'] === 'way') {
-                $feature = self::createFeature($osmItem, $nodes);
-                if ($feature) {
-                    $output['features'] []= $feature;
-                }
-            }
-        }
-
-        return $encode ? json_encode($output) : $output;
-    }
-
     /**
-     * Creates an array of node coordinates indexed by node id
+     * Creates an array of nodes indexed by node id
      * @param  array $elements  OSM items
-     * @return array            node coordinates e.g. [id => [lon, lat], ...]
+     * @return array            nodes e.g. [id => {lon, lat, tags}, ...]
      */
     public static function collectNodes($elements) {
         $nodes = array();
@@ -63,7 +87,7 @@ class Overpass2Geojson
         foreach ($elements as $osmItem) {
             if (isset($osmItem['type']) && $osmItem['type'] === 'node') {
                 if (isset($osmItem['id']) && isset($osmItem['lat']) && isset($osmItem['lon'])) {
-                    $nodes[$osmItem['id']] = array($osmItem['lon'], $osmItem['lat']);
+                    $nodes[$osmItem['id']] = $osmItem;
                 }
             }
         }
@@ -77,12 +101,12 @@ class Overpass2Geojson
      * @return mixed           false if invalid feature otherwise
      *                         array GeoJSON Feature with LineString geometry
      */
-    public static function createFeature($way, $nodes) {
+    public static function createWayFeature($way, $nodes) {
         $coords = array();
         if (isset($way['nodes'])) {
             foreach ($way['nodes'] as $nodeId) {
                 if (isset($nodes[$nodeId])) {
-                    $coords []= $nodes[$nodeId];
+                    $coords[] = array($nodes[$nodeId]['lon'], $nodes[$nodeId]['lat']);
                 }
             }
         }
