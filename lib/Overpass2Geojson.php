@@ -1,6 +1,9 @@
 <?php
 
 class Overpass2Geojson {
+	
+	public static $polygon;
+	
     /**
      * Converts a JSON string or decoded array into a GeoJSON string or array.
      * This creates a LineString feature for each supplied way, using the nodes
@@ -9,7 +12,10 @@ class Overpass2Geojson {
      * @param  boolean $encode whether to encode output as string
      * @return mixed           false if failed, otherwise GeoJSON string or array
      */
-    public static function convertWays($input, $encode = true) {
+    public static function convertWays($input, $encode = true, $polygon = false) {
+	    
+	    self::$polygon = $polygon;
+	    
         $inputArray = self::validateInput($input);
         if (!$inputArray) {
             return false;
@@ -99,7 +105,7 @@ class Overpass2Geojson {
      * @param  array $way  OSM way
      * @param  array $nodes    OSM node coordinates indexed by id
      * @return mixed           false if invalid feature otherwise
-     *                         array GeoJSON Feature with LineString geometry
+     *                         array GeoJSON Feature with LineString or Polygon geometry
      */
     public static function createWayFeature($way, $nodes) {
         $coords = array();
@@ -109,15 +115,20 @@ class Overpass2Geojson {
                     $coords[] = array($nodes[$nodeId]['lon'], $nodes[$nodeId]['lat']);
                 }
             }
+            
+            // If polygon was requested, add the first node as the last node to enclose the polygon (does not verify if this is a valid polygon)
+            if(self::$polygon):
+	            $coords[] = [reset($nodes)['lon'], reset($nodes)['lat']];
+            endif;
         }
         if (count($coords) >= 2) {
             return array(
                 'type' => 'Feature',
                 'geometry' => array(
-                    'type' => 'LineString',
-                    'coordinates' => $coords,
+                    'type' => self::$polygon ? 'Polygon' : 'LineString',
+                    'coordinates' => self::$polygon ? [$coords] : $coords,
                 ),
-                'properties' => isset($way['tags']) ? $way['tags'] : array(),
+                'properties' => isset($way['tags']) ? array_merge($way['tags'], ["id"=>$way['id']]) : ["id"=>$way['id']],
             );
         }
         return false;
