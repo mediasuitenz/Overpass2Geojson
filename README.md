@@ -13,6 +13,8 @@ PHP modules to convert Overpass API JSON output to GeoJSON format
 
 With the ways conversion, if any ways reference nodes that aren't also in the input, those nodes will be ignored. If there are less than 2 nodes for any way, that way will not produce a Feature as LineStrings must have more than 2 coordinates.
 
+To create a Polygon instead of a LineString you can pass true as the 3rd argument to `Overpass2Geojson::convertWays`, or set `Overpass2Geojson::polygon = true;` before using the utility.
+
 ## Example
 
 ### Overpass query
