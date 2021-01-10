@@ -115,11 +115,6 @@ class Overpass2Geojson {
                     $coords[] = array($nodes[$nodeId]['lon'], $nodes[$nodeId]['lat']);
                 }
             }
-            
-            // If polygon was requested, add the first node as the last node to enclose the polygon (does not verify if this is a valid polygon)
-            if(self::$polygon):
-	            $coords[] = [reset($nodes)['lon'], reset($nodes)['lat']];
-            endif;
         }
         if (count($coords) >= 2) {
             return array(
