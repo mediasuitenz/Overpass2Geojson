@@ -1,0 +1,32 @@
+# yaml-language-server: $schema=https://json.schemastore.org/circleciconfig.json
+#
+version: 2.1
+orbs:
+  trivy: fifteen5/trivy-orb@1.0.0
+jobs:
+  generate-sbom:
+    docker:
+      - image: cimg/base:current
+    steps:
+      - checkout
+      - trivy/scan:
+          version: 0.74.0
+          args: fs -f cyclonedx -o sbom.json --server https://trivy.msapp.co.nz --token ${TRIVY_TOKEN} .
+      - run:
+          name: upload to Dependency Tracker
+          command: |
+            curl -X 'POST' ${DT_URL}/api/v1/bom -H 'accept: application/json' \
+            -H 'Content-Type: multipart/form-data' -H "X-API-Key: ${DT_API_KEY}" \
+            -F projectName=${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME} \
+            -F autoCreate=true -F bom=@sbom.json
+      - store_artifacts:
+          path: sbom.json
+workflows:
+  trunk-branch:
+    jobs:
+      - generate-sbom:
+          filters:
+            branches:
+              only: main
+          context:
+            - generate_sbom
